@@ -18,3 +18,13 @@ H:\ZegAnalogowy\ZegAnalogowy\bin\Debug\ZegAnalogowy.exe.config
 H:\ZegAnalogowy\ZegAnalogowy\bin\Debug\ZegAnalogowy.exe
 H:\ZegAnalogowy\ZegAnalogowy\bin\Debug\ZegAnalogowy.pdb
 C:\Users\tymja\source\repos\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.csprojAssemblyReference.cache
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\bin\Debug\ZegAnalogowy.exe.config
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\bin\Debug\ZegAnalogowy.exe
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\bin\Debug\ZegAnalogowy.pdb
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.csprojAssemblyReference.cache
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.MainForm.resources
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.Properties.Resources.resources
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.csproj.GenerateResource.cache
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.csproj.CoreCompileInputs.cache
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.exe
+E:\GIT PROG\po-cz-11p-Yanish95\ZegAnalogowy\ZegAnalogowy\obj\Debug\ZegAnalogowy.pdb

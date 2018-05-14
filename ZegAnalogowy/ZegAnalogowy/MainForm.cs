@@ -4,13 +4,16 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
 namespace ZegAnalogowy
 {
+    
     public partial class MainForm : Form
     {
         private Rectangle rect;
@@ -23,6 +26,9 @@ namespace ZegAnalogowy
         private Pen pioroSek;
         private int srednica;
 
+        //zmienne globalne do obsługi myszki
+        private Point MouseAktualnaPoz, MouseNowaPoz, formPoz, formNowaPoz;
+        private bool mouseDown = false;
 
         //wspolrzedne srodka okna
         int srWidth;
@@ -45,6 +51,7 @@ namespace ZegAnalogowy
         DateTime czas;
         //Aktualny czas 
        
+            
         public MainForm()
         {
             srWidth = this.ClientSize.Width / 2;
@@ -54,9 +61,15 @@ namespace ZegAnalogowy
 
             InitializeComponent();
             inicjujNarzedzia();
+            
 
             this.Paint += new PaintEventHandler(MainForm_Paint);
-
+            //double bufering braknieprzyjemnego odświerzania
+            this.SetStyle(ControlStyles.DoubleBuffer, true);
+            this.SetStyle(ControlStyles.UserPaint, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+            //pozbywanie się z paska zadań
+            this.ShowInTaskbar = false;
         }
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
@@ -94,17 +107,16 @@ namespace ZegAnalogowy
             cienTarczyKolor.EndCap = LineCap.ArrowAnchor;
             cienTarczyKolor.StartCap = LineCap.RoundAnchor;
         }
-        //MOŻE NIE DZIAŁAć ALE TAK WYKOMBINOWAŁEM CZAS
-        void aktualnyczas()
-        {
-            czas = DateTime.Now;
-            godziny = czas.Hour;
-            minuty = czas.Minute;
-            sekundy = czas.Second + (czas.Millisecond * 0.001);
-        }
+      
         //metoda do rysowania tegesów
         void rysuj(Graphics graphics)
+
         {
+            //anti-aliasing
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //
             srWidth = this.ClientSize.Width / 2;
             srHeight = this.ClientSize.Height / 2;
             ramka = 18;
@@ -134,8 +146,84 @@ namespace ZegAnalogowy
             {
                 graphics.DrawEllipse(pioro, -1 * obliczX(i * stopnie + 90, promien) - 1, -1 * obliczY(i * stopnie + 90, promien) - 1, 2, 2);
             }
+            //aktualny czas 
+            czas = DateTime.Now;
+            godziny = czas.Hour;
+            minuty = czas.Minute;
+            sekundy = czas.Second + (czas.Millisecond * 0.001);
+
+            godzinyTic = 2.0 * Math.PI * (godziny + minuty / 60.0) / 12.0; promien=30;
+            //Cień na tarczę 
+            Point pktSrodek = new Point(0, 0);
+            Point pktCienGodzina = new Point((int)((promien * Math.Sin(godzinyTic)) + 2), (int)((-(promien) * Math.Cos(godzinyTic)) + 2));
+            graphics.DrawLine(cienTarczyKolor, pktSrodek, pktCienGodzina);
+            Point pktWskGodzina = new Point((int)(promien * Math.Sin(godzinyTic)), (int)(-(promien) * Math.Cos(godzinyTic)));
+            graphics.DrawLine(pioro, pktSrodek, pktWskGodzina);
+            //minuty i sekundy 
+            minutyTic = 2.0 * Math.PI * (minuty + sekundy / 60.0) / 60.0; promien = 57;
+
+            Point pktCienMinuta = new Point((int)(promien * Math.Sin(minutyTic) + 2), (int)(-(promien) * Math.Cos(minutyTic) + 2));
+            graphics.DrawLine(cienTarczyKolor, pktSrodek, pktCienMinuta);
+            Point pktWskMinuta = new Point((int)(promien * Math.Sin(minutyTic)), (int)(-(promien) * Math.Cos(minutyTic)));
+            graphics.DrawLine(pioro, pktSrodek, pktWskMinuta);
+
+            sekundyTic = 2.0 * Math.PI * (minuty + sekundy / 60.0);
+            Point pktCienSekunda = new Point((int)(promien * Math.Sin(sekundyTic)), (int)(-(promien) * Math.Cos(sekundyTic)));
+            graphics.DrawLine(pioroSek, pktSrodek, pktCienSekunda);
+            Point pktWskSekunda = new Point((int)(promien * Math.Sin(sekundyTic)), (int)(-(promien) * Math.Cos(sekundyTic)));
+            graphics.DrawLine(pioroSek, pktSrodek, pktWskSekunda);
+        }
+      
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            Invalidate();
         }
 
+        private void zamknijToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+        //NIE DZIAŁA - ZAMYKANIE ZEGARKA PRZEZ ROZWIJANE MENU- NIE DZIALA
+        private void contextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
 
+        }
+        private void MainForm_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                this.ContextMenuStrip.Show(Control.MousePosition);
+            }
+        }
+
+        //NIE DZIAŁA -PRZESUWANIE ZEGARKA NACISNIĘCIEM PRZYCISKU MYSZY-NIE DZIAŁA 
+        private void MainForm_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                mouseDown = true;
+                MouseAktualnaPoz = Control.MousePosition;
+                formPoz = Location;
+            }
+        }
+        //Jeśli mysz wciśnieta wylicza lokalizacje i przesuwa zegarek 
+        private void MainForm_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (mouseDown == true)
+            {
+                MouseNowaPoz = Control.MousePosition;
+                formNowaPoz.X = MouseNowaPoz.X - MouseAktualnaPoz.X + formPoz.X;
+                formNowaPoz.Y = MouseNowaPoz.Y - MouseAktualnaPoz.Y + formPoz.Y;
+                Location = formNowaPoz;
+                formPoz = formNowaPoz;
+                MouseAktualnaPoz = MouseNowaPoz;
+            }
+        }
+        //zdarzenie po puszczeniu przycisku myszy 
+        private void MainForm_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                mouseDown = false;
+        }
     }
 }
